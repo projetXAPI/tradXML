@@ -1,18 +1,14 @@
 package xml;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 import com.rusticisoftware.tincan.Activity;
 import com.rusticisoftware.tincan.Agent;
@@ -25,13 +21,14 @@ import com.rusticisoftware.tincan.lrsresponses.StatementLRSResponse;
 public class Main {
 	static org.jdom2.Document document;
 	static Element racine;
+	static HashMap<String, Integer> occurence = new HashMap<String, Integer>(); //Stockera les occurences des mots
+	static String filtreMot[] = { "." };
 	//static String listDossier[] = {"words", "topic", "dossierTruc" , "DossierDia"}; //Stock la liste des dossier à traduire
 
 	
 	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
 		//On crée une instance de SAXBuilder
 	      SAXBuilder sxb = new SAXBuilder();
-	      
 
 	      initXapi();
 	      
@@ -49,23 +46,37 @@ public class Main {
 	      racine = document.getRootElement();
 
 	      //Affiche l'ensemble des données du fichier XML
-	      afficheXML();
+	      occurence();
 	}
 	
-	static void afficheXML()
+	static void occurence()
 	{
-		System.out.println("Affichage");
+		System.out.println("Compte le nombre d'occurence...");
 	   //On crée une List contenant tous les noeuds "nite" de l'Element racine
-	   List listNite = racine.getChildren("w");
+	   List<Element> listNite = racine.getChildren("w");
 
 	   //On crée un Iterator sur notre liste
 	   Iterator i = listNite.iterator();
 	   while(i.hasNext())
 	   {
-	      //On recrée l'Element courant à chaque tour de boucle
-	      Element courant = (Element)i.next();
-	      //On affiche le nom de l’élément courant
-	      System.out.println(courant.getText());
+		   //On recrée l'Element courant à chaque tour de boucle
+		   Element courant = (Element)i.next();
+		   
+		   if(rechercheTab(courant.getText())){
+			   continue;			  
+		   }
+		   
+		   
+		   if(occurence.containsKey(courant.getText()))
+		   {
+			   occurence.replace(courant.getText(), occurence.get(courant.getText()) + 1);
+			   System.out.println("Le mot "+courant.getText() + " est présent " + occurence.get(courant.getText()) + " !");
+		   }
+		   else {
+		      //On affiche le nom de l’élément courant
+		      System.out.println(courant.getText());
+		      occurence.put(courant.getText(), 1);
+		   }
 	   }
 	}
 	
@@ -97,6 +108,14 @@ public class Main {
 	      else {
 	          // failure, error information is available in lrsRes.getErrMsg()
 	      }
+	}
+	
+	static boolean rechercheTab(String recherche) {
+		for(int i = 0; i < filtreMot.length; i++){
+			if(recherche.equals(filtreMot[i]))
+				return true;				
+		}
+		return false;
 	}
 
 }
