@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -28,9 +29,8 @@ public class Main {
 	
 	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
 		//On crée une instance de SAXBuilder
+		System.out.println("TEST");
 	      SAXBuilder sxb = new SAXBuilder();
-
-	      initXapi();
 	      
 	      try
 	      {
@@ -41,15 +41,19 @@ public class Main {
 	      catch(Exception e){
 	    	  System.out.println("Erreur lors du chargement du fichier XML :'(");
 	      }
-
+	      
 	      //On initialise un nouvel élément racine avec l'élément racine du document.
 	      racine = document.getRootElement();
+	      RemoteLRS lrs = initXapi();
+	      envoieOccurence(lrs);
+	      
+
 
 	      //Affiche l'ensemble des données du fichier XML
-	      occurence();
+	      //occurence();
 	}
 	
-	static void occurence()
+	static HashMap<String, Integer> occurence()
 	{
 		System.out.println("Compte le nombre d'occurence...");
 	   //On crée une List contenant tous les noeuds "nite" de l'Element racine
@@ -70,7 +74,6 @@ public class Main {
 		   if(occurence.containsKey(courant.getText()))
 		   {
 			   occurence.replace(courant.getText(), occurence.get(courant.getText()) + 1);
-			   System.out.println("Le mot "+courant.getText() + " est présent " + occurence.get(courant.getText()) + " !");
 		   }
 		   else {
 		      //On affiche le nom de l’élément courant
@@ -78,36 +81,54 @@ public class Main {
 		      occurence.put(courant.getText(), 1);
 		   }
 	   }
+	   return occurence;
 	}
 	
-	static void initXapi() throws MalformedURLException, URISyntaxException
+	static RemoteLRS initXapi() throws MalformedURLException
 	{
 		 RemoteLRS lrs = new RemoteLRS();
 
-	      lrs.setEndpoint("https://cloud.scorm.com/tc/public/");
+	      lrs.setEndpoint("https://cloud.scorm.com/tc/0O6GMM7KOI/sandbox/");
 	      lrs.setVersion(TCAPIVersion.V100);
-	      lrs.setUsername("<Test User>");
-	      lrs.setPassword("<Test User's Password>");
+	      lrs.setUsername("vincentglize@hotmail.fr");
+	      lrs.setPassword("iutbay64");
+	      
+	      return lrs;
+	}
+	
+	static void envoieOccurence(RemoteLRS lrs) throws URISyntaxException
+	{
+		HashMap<String, Integer> occurence = occurence();
+		for(Map.Entry mapentry : occurence.entrySet()){
+			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+				//Création statement pour le mot courant (Key = mot Value = le nombre d'occurence)
+				Agent agent = new Agent();
+		      agent.setMbox("mailto:vincentglize@hotmail.fr");
+		      agent.setName("Vincent");
 
-	      Agent agent = new Agent();
-	      agent.setMbox("mailto:info@tincanapi.com");
+		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "occurence");
+		      
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      //activity.setId("testatest");
+		      
+		      Statement st = new Statement();
+		      st.setActor(agent);
+		      st.setVerb(verb);
+		      st.setObject(activity);
 
-	      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted");
-
-	      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava");
-
-	      Statement st = new Statement();
-	      st.setActor(agent);
-	      st.setVerb(verb);
-	      st.setObject(activity);
-
-	      StatementLRSResponse lrsRes = lrs.saveStatement(st);
-	      if (lrsRes.getSuccess()) {
-	          // success, use lrsRes.getContent() to get the statement back
-	      }
-	      else {
-	          // failure, error information is available in lrsRes.getErrMsg()
-	      }
+		      StatementLRSResponse lrsRes = lrs.saveStatement(st);
+		      if (lrsRes.getSuccess()) {
+		          // success, use lrsRes.getContent() to get the statement back
+		    	  System.out.println("Mot bien enregistré");
+		      }
+		      else {
+		          // failure, error information is available in lrsRes.getErrMsg()
+		    	  System.out.println("Problème lors de l'envoie du statement !");
+		      }
+			
+		}
+		
+		System.out.println("Envoie des mots fini");
 	}
 	
 	static boolean rechercheTab(String recherche) {
