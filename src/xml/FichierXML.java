@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
+import org.w3c.dom.NodeList;
 
 import com.rusticisoftware.tincan.RemoteLRS;
 
@@ -17,11 +18,11 @@ public class FichierXML {
 	private String filtreMot[] = { "." };
 	private SAXBuilder sxb = new SAXBuilder();
 	
-	public FichierXML(String nomFichier) {
+	public FichierXML(String nomFichier) throws Exception {
 		ouvrirFichier(nomFichier);
 	}
 	
-	public void ouvrirFichier(String nomFichier) {	      
+	public void ouvrirFichier(String nomFichier) throws Exception {	
 	      try
 	      {
 	         //On crée un nouveau document JDOM avec en argument le fichier XML
@@ -29,7 +30,7 @@ public class FichierXML {
 	         this.document = sxb.build(new File(nomFichier));
 	      }
 	      catch(Exception e){
-	    	  System.out.println("Erreur lors du chargement du fichier XML :'(");
+	    	  throw new Exception();
 	      }
 	    //On initialise un nouvel élément racine avec l'élément racine du document.
 	      racine = document.getRootElement();
@@ -57,7 +58,7 @@ public class FichierXML {
 		   
 		   if(occurence.containsKey(courant.getText()))
 		   {
-			   occurence.replace(courant.getText(), occurence.get(courant.getText()) + 1);
+			   //occurence.replace(courant.getText(), occurence.get(courant.getText()) + 1);
 		   }
 		   else {
 		      //On affiche le nom de l’élément courant
@@ -66,6 +67,36 @@ public class FichierXML {
 		   }
 	   }
 	   return occurence;
+	}
+	
+	public HashMap<String, String> infoReu(String nomReu) {
+		HashMap<String, String> info = new HashMap<String, String>(); 
+		List<Element> listNite = racine.getChildren("meeting");
+
+		//On crée un Iterator sur notre liste
+		Iterator i = listNite.iterator();
+		while(i.hasNext())
+		{
+			//On récupère les infos que pour note réunion
+			Element courant = (Element)i.next();
+			if(nomReu.equals(courant.getAttributeValue("observation"))) {
+				info.put("name", courant.getAttributeValue("name"));
+				info.put("date", courant.getAttributeValue("dateOnly"));
+				info.put("titre", courant.getAttributeValue("topic"));
+				info.put("duree", courant.getAttributeValue("duration"));
+				/*
+				List<Element> listParticipant = courant.getChildren("speaker");
+				Iterator i2 = listParticipant.iterator();
+				while(i.hasNext())
+				{
+					//Prévu si on veut récupérer les infos des membres				
+				}
+				*/
+				return info;
+				
+			}
+		}
+		return info;
 	}
 	
 	public boolean rechercheTab(String recherche) {
