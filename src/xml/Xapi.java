@@ -1,5 +1,6 @@
 package xml;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -8,11 +9,13 @@ import java.util.Map;
 import com.rusticisoftware.tincan.Activity;
 import com.rusticisoftware.tincan.ActivityDefinition;
 import com.rusticisoftware.tincan.Agent;
+import com.rusticisoftware.tincan.Extensions;
 import com.rusticisoftware.tincan.RemoteLRS;
 import com.rusticisoftware.tincan.Statement;
 import com.rusticisoftware.tincan.TCAPIVersion;
 import com.rusticisoftware.tincan.Verb;
 import com.rusticisoftware.tincan.lrsresponses.StatementLRSResponse;
+import com.rusticisoftware.tincan.json.StringOfJSON;
 
 public class Xapi {
 	
@@ -67,7 +70,7 @@ public class Xapi {
 	}
 
 
-	public void envoieInfoReu(RemoteLRS lrs2, HashMap<String, String> infoReu, String nomReu) throws URISyntaxException {
+	public void envoieInfoReu(RemoteLRS lrs2, HashMap<String, String> infoReu, String nomReu) throws URISyntaxException, IOException {
 		for(Map.Entry mapentry : infoReu.entrySet()){
 			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
 				Agent agent = new Agent();
@@ -77,6 +80,10 @@ public class Xapi {
 		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "information");
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
+
+		      ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
+		      activity.setDefinition(ad);
 		      
 		      //activity.setId("test");
 		      
@@ -96,6 +103,43 @@ public class Xapi {
 		      }
 			
 		}
+	}
+
+
+	public void envoiePhrase(RemoteLRS lrs2, HashMap<Integer, String> phrases, String nomReu, String acteur) throws URISyntaxException {
+		for(Map.Entry mapentry : phrases.entrySet()){
+			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+				Agent agent = new Agent();
+				agent.setMbox("mailto:vincentglize@hotmail.fr");
+		      agent.setName(acteur);
+
+		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "phrase");
+
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
+
+		      //ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
+		      activity.setDefinition(ad);
+		      
+		      //activity.setId("test");
+		      
+		      Statement st = new Statement();
+		      st.setActor(agent);
+		      st.setVerb(verb);
+		      st.setObject(activity);
+
+		      StatementLRSResponse lrsRes = lrs.saveStatement(st);
+		      if (lrsRes.getSuccess()) {
+		          // success, use lrsRes.getContent() to get the statement back
+		    	  //System.out.println("Mot bien enregistré");
+		      }
+		      else {
+		          // failure, error information is available in lrsRes.getErrMsg()
+		    	  System.out.println("Problème lors de l'envoie du statement !");
+		      }
+			
+		}
+		
 	}
 
 }

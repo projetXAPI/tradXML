@@ -32,6 +32,10 @@ public class Main {
 		String nomReu = args[1];
 		FichierXML fichierMot = null;
 		FichierXML fichierInfoReu = null;
+		FichierXML fichierPhraseA = null;
+		FichierXML fichierPhraseB = null;
+		FichierXML fichierPhraseC = null;
+		FichierXML fichierPhraseD = null;
 		String[] infoReu = null;
 		RemoteLRS lrs = null;
 		//System.out.println(chemin);
@@ -41,8 +45,9 @@ public class Main {
 			System.out.println("Récupération de la réunion...");
 			//fichierMot = new FichierXML("sourceXML/words/EN2001a.A.words.xml");
 			//System.out.println("/home/vincent/tradXML/sourceXML/words/EN2001a.A.words.xml");
-			fichierMot = new FichierXML(chemin + "/words/"+ nomReu +".A.words.xml");
+			//fichierMot = new FichierXML(chemin + "/words/"+ nomReu +".A.words.xml");
 			fichierInfoReu = new FichierXML(chemin + "/corpusResources/meetings.xml");
+			fichierPhraseA = new FichierXML(chemin + "/words/"+nomReu+".A.words.xml");
 		} catch (Exception e) {
 			System.out.println("Le chemin du corpus ou le nom de la réunion est invalide");
 			System.exit(1);
@@ -62,7 +67,12 @@ public class Main {
 	    System.out.println("Envoie des statements sur le serveur...");
 	    try {
 	    	//xAPI.envoieOccurence(lrs, fichierMot.occurence());
-	    	xAPI.envoieInfoReu(lrs, fichierInfoReu.infoReu(nomReu), nomReu);
+	    	//xAPI.envoieInfoReu(lrs, fichierInfoReu.infoReu(nomReu), nomReu);
+	    	xAPI.envoiePhrase(lrs, fichierPhraseA.creationPhrase(), nomReu, "A");
+	    	HashMap<Integer, String> test = fichierPhraseA.creationPhrase();
+	    	for(Map.Entry mapentry : test.entrySet()){
+	    		System.out.println(mapentry.getValue());
+	    	}
 	    } catch(Exception e) {
 	    	System.out.println("L'envoi des statements sur le serveur est impossible, veuillez réessayer ultérieurement");
 	    	System.exit(1);

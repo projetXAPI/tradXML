@@ -1,6 +1,7 @@
 package xml;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -105,5 +106,41 @@ public class FichierXML {
 				return true;				
 		}
 		return false;
+	}
+
+	public HashMap<Integer, String> creationPhrase() {
+		List<Element> listNite = racine.getChildren("w");
+		int numPhrase = 0;
+		/*
+		String[] phrases;
+		phrases = new String[200];
+		*/
+		 HashMap<Integer, String> phrases = new HashMap<Integer, String>(); 
+
+		   //On crée un Iterator sur notre liste
+		Iterator i = listNite.iterator();
+		while(i.hasNext())
+		{
+			//On recrée l'Element courant à chaque tour de boucle
+			Element courant = (Element)i.next();
+			
+			if(phrases.get(numPhrase) == null)
+				phrases.put(numPhrase, courant.getText());
+			else if(",".equals(courant.getText()) || ".".equals(courant.getText()))
+				phrases.put(numPhrase, phrases.get(numPhrase) + courant.getText());
+			else
+				phrases.put(numPhrase, phrases.get(numPhrase) + " " + courant.getText());
+			
+			//Si fin de phrase
+			if(".".equals(courant.getText()) || "!".equals(courant.getText()) || "?".equals(courant.getText())) {
+				//System.out.println("PONC : " + courant.getText());
+				numPhrase++;
+			}
+			else {
+				System.out.println(courant.getText() + " n " + numPhrase);
+			}			   
+		}
+		
+		return phrases;
 	}
 }
