@@ -3,6 +3,7 @@ package xml;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,7 +38,12 @@ public class FichierXML {
 	      racine = document.getRootElement();
 	}
 	
+	/*
+	 * Fonction plus utilisé mais laissé si jamais une utilité est trouvé. 
+	 * Elle permet de renvoyé les occurences des mots dans 
+	 */
 	
+	/*
 	
 	public HashMap<String, Integer> occurence()
 	{
@@ -70,6 +76,14 @@ public class FichierXML {
 	   return occurence;
 	}
 	
+	*/
+	
+	/*
+	 * Méthode pour créer les informations relatif à la réunion
+	 * paramètre : Nom de la réunion
+	 * Retour : HashMap composé d'une clé et de sa valeur (chaine de caractère)
+	 * 
+	 */
 	public HashMap<String, String> infoReu(String nomReu) {
 		HashMap<String, String> info = new HashMap<String, String>(); 
 		List<Element> listNite = racine.getChildren("meeting");
@@ -100,6 +114,11 @@ public class FichierXML {
 		return info;
 	}
 	
+	/*
+	 * Méthode plus utilisé, elle servait à chercher une valeur dans un tableau
+	 * 
+	 */
+	/*
 	public boolean rechercheTab(String recherche) {
 		for(int i = 0; i < filtreMot.length; i++){
 			if(recherche.equals(filtreMot[i]))
@@ -107,15 +126,21 @@ public class FichierXML {
 		}
 		return false;
 	}
-
-	public HashMap<Integer, String> creationPhrase() {
+	*/
+	
+	
+	/*
+	 * Méthode pour créer les phrases
+	 * Retour : tableau avec les phrases
+	 * 
+	 */
+	public HashMap<Integer, String[]> creationPhrase() {
 		List<Element> listNite = racine.getChildren("w");
 		int numPhrase = 0;
-		/*
-		String[] phrases;
-		phrases = new String[200];
-		*/
-		 HashMap<Integer, String> phrases = new HashMap<Integer, String>(); 
+		//String phrase;
+		String[] phrase;
+		phrase = new String[2];
+		 HashMap<Integer, String[]> phrases = new HashMap<Integer, String[]>(); 
 
 		   //On crée un Iterator sur notre liste
 		Iterator i = listNite.iterator();
@@ -124,12 +149,14 @@ public class FichierXML {
 			//On recrée l'Element courant à chaque tour de boucle
 			Element courant = (Element)i.next();
 			
+			phrase = phrases.get(numPhrase);
+			
 			if(phrases.get(numPhrase) == null)
-				phrases.put(numPhrase, courant.getText());
+				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), courant.getText() });
 			else if(",".equals(courant.getText()) || ".".equals(courant.getText()))
-				phrases.put(numPhrase, phrases.get(numPhrase) + courant.getText());
+				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), phrase[1] + courant.getText() });
 			else
-				phrases.put(numPhrase, phrases.get(numPhrase) + " " + courant.getText());
+				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), phrase[1] + " " + courant.getText() });
 			
 			//Si fin de phrase
 			if(".".equals(courant.getText()) || "!".equals(courant.getText()) || "?".equals(courant.getText())) {
@@ -143,4 +170,70 @@ public class FichierXML {
 		
 		return phrases;
 	}
+	
+	/*
+	 * Méthode pour créer le temps que chaque membre a était dans chaque rôle (neutre, protagoniste, etc...)
+	 * Retour : HashMap composé d'une clé et de sa valeur (chaine de caractère)
+	 * 
+	 */
+	public HashMap<String, Float> creationRoleTemps() {
+		List<Element> listNite = racine.getChildren("role");
+		//String phrase;
+		HashMap<String, Float> roles = new HashMap<String, Float>(); 
+		float debut;
+		float fin;
+		   //On crée un Iterator sur notre liste
+		Iterator i = listNite.iterator();
+		while(i.hasNext())
+		{
+			//On recrée l'Element courant à chaque tour de boucle
+			Element courant = (Element)i.next();
+			
+			debut = Float.parseFloat(courant.getAttributeValue("starttime").toString());
+			fin = Float.parseFloat((courant.getAttributeValue("endtime").toString()));
+			if(roles.containsKey(courant.getAttributeValue("type")))
+			{
+				roles.put(courant.getAttributeValue("type"), (roles.get(courant.getAttributeValue("type")) + (fin - debut)));
+			}
+			else {
+				roles.put(courant.getAttributeValue("type"), (float) 0);
+			}		
+		}
+		
+		return roles;
+	}
+
+	/*
+	 * Méthode pour créer les rôle avec leurs temps associé
+	 * Retour : HashMap composé d'une clé et de sa valeur (Valeur composé du début de chaque fois ou il est dans ce role) (chaine de caractère)
+	 * 
+	 */
+	public HashMap<String, String> creationRole() {
+		List<Element> listNite = racine.getChildren("role");
+		//String phrase;
+		//HashMap<String, Float> roles = new HashMap<String, Float>(); 
+		HashMap<String, String> roles = new HashMap<String, String>();
+		String debut;
+		String type;
+		   //On crée un Iterator sur notre liste
+		Iterator i = listNite.iterator();
+		while(i.hasNext())
+		{
+			//On recrée l'Element courant à chaque tour de boucle
+			Element courant = (Element)i.next();
+			
+			type = courant.getAttributeValue("type").toString();
+			debut = courant.getAttributeValue("starttime").toString();
+			
+			
+			if(roles.containsKey(courant.getAttributeValue("type"))) {
+				roles.put(type, roles.get(courant.getAttributeValue("type")) + " | " + debut);
+			} else {
+				roles.put(type, debut);
+			}
+		}
+		
+		return roles;
+	}
+
 }

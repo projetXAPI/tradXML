@@ -3,7 +3,10 @@ package xml;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.rusticisoftware.tincan.Activity;
@@ -15,6 +18,7 @@ import com.rusticisoftware.tincan.Statement;
 import com.rusticisoftware.tincan.TCAPIVersion;
 import com.rusticisoftware.tincan.Verb;
 import com.rusticisoftware.tincan.lrsresponses.StatementLRSResponse;
+import com.rusticisoftware.tincan.lrsresponses.StatementsResultLRSResponse;
 import com.rusticisoftware.tincan.json.StringOfJSON;
 
 public class Xapi {
@@ -34,7 +38,7 @@ public class Xapi {
 	      return lrs;
 	}
 	
-	
+	/*
 	public void envoieOccurence(RemoteLRS lrs, HashMap<String, Integer> occurence) throws URISyntaxException
 	{
 		for(Map.Entry mapentry : occurence.entrySet()){
@@ -68,9 +72,16 @@ public class Xapi {
 		
 		System.out.println("Envoie des mots fini");
 	}
+	*/
 
-
-	public void envoieInfoReu(RemoteLRS lrs2, HashMap<String, String> infoReu, String nomReu) throws URISyntaxException, IOException {
+	/*
+	 * Méthode pour créer les statements relatif aux infos de la réunion
+	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité
+	 * Retour : Retour la liste des statements créés
+	 * 
+	 */
+	public List<Statement> creationStatementInfoReu(RemoteLRS lrs2, HashMap<String, String> infoReu, String nomReu) throws URISyntaxException, IOException {
+		List listStatements = new LinkedList();
 		for(Map.Entry mapentry : infoReu.entrySet()){
 			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
 				Agent agent = new Agent();
@@ -91,35 +102,51 @@ public class Xapi {
 		      st.setActor(agent);
 		      st.setVerb(verb);
 		      st.setObject(activity);
-
-		      StatementLRSResponse lrsRes = lrs.saveStatement(st);
-		      if (lrsRes.getSuccess()) {
-		          // success, use lrsRes.getContent() to get the statement back
-		    	  //System.out.println("Mot bien enregistré");
-		      }
-		      else {
-		          // failure, error information is available in lrsRes.getErrMsg()
-		    	  System.out.println("Problème lors de l'envoie du statement !");
-		      }
+		      
+		      listStatements.add(st);
 			
 		}
+		return listStatements;
 	}
 
-
-	public void envoiePhrase(RemoteLRS lrs2, HashMap<Integer, String> phrases, String nomReu, String acteur) throws URISyntaxException {
+	/*
+	 * Méthode pour créer les statements relatif aux phrases dites d'un membre donné
+	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, acteur
+	 * Retour : Retour la liste des statements créés
+	 * 
+	 */
+	public List<Statement> creerStatementsPhrases(HashMap<Integer, String[]> phrases, String nomReu, String acteur) throws URISyntaxException, IOException {
+		String debut;
+		String phrase;
+		String test;
+		String[] value;
+		List<Statement> listStatements = new LinkedList();
 		for(Map.Entry mapentry : phrases.entrySet()){
-			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+			value = (String[]) mapentry.getValue();
+			debut = value[0];
+			phrase = (String) value[1];
+			
+			System.out.println(phrase.toString());
+			
+			System.out.println(acteur + " clé " + mapentry.getKey() + " Valeur " + debut + " : " + phrase);
 				Agent agent = new Agent();
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
 
-		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "phrase");
+		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "phrase_"+nomReu);
+		      
 
-		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
-		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", phrase, debut);
+		      ActivityDefinition ad = new ActivityDefinition(phrase, debut);
 
-		      //ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
-		      activity.setDefinition(ad);
+		      //ad.setExtensions(new Extensions(new StringOfJSON("meetingID:es2002")));
+		      //ad.setMoreInfo("es2002");
+		      
+		      
+		      //activity.setDefinition(ad);
+		      
+		      
+		      
 		      
 		      //activity.setId("test");
 		      
@@ -127,19 +154,116 @@ public class Xapi {
 		      st.setActor(agent);
 		      st.setVerb(verb);
 		      st.setObject(activity);
+		      
+		      System.out.println("******************************************");
+		      System.out.println(st.toJSON());
+		      System.out.println("******************************************");
 
-		      StatementLRSResponse lrsRes = lrs.saveStatement(st);
-		      if (lrsRes.getSuccess()) {
-		          // success, use lrsRes.getContent() to get the statement back
-		    	  //System.out.println("Mot bien enregistré");
-		      }
-		      else {
-		          // failure, error information is available in lrsRes.getErrMsg()
-		    	  System.out.println("Problème lors de l'envoie du statement !");
-		      }
+		      listStatements.add(st);
+				
+		}
+		
+		return listStatements;
+		
+	}
+
+	
+	/*
+	 * Méthode pour créer les statements relatif aux temps de chaque rôle d'un membre
+	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
+	 * Retour : Retour la liste des statements créés
+	 * 
+	 */
+	public List<Statement> creerStatementsRoleTemps(HashMap<String, Float> object, String nomReu,
+			String acteur) throws URISyntaxException {
+		
+		List<Statement> listStatements = new LinkedList();
+		
+		for(Map.Entry mapentry : object.entrySet()){
+			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+				Agent agent = new Agent();
+				agent.setMbox("mailto:vincentglize@hotmail.fr");
+		      agent.setName(acteur);
+
+		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "temps_role_"+nomReu);
+
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
+
+		      //ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
+		      //activity.setDefinition(ad);
+		      
+		      //activity.setId("test");
+		      
+		      Statement st = new Statement();
+		      st.setActor(agent);
+		      st.setVerb(verb);
+		      st.setObject(activity);
+		      
+		      listStatements.add(st);
 			
 		}
 		
+		return listStatements;
+	}
+	
+	
+	/*
+	 * Méthode pour créer les statements relatif aux role de chaque membre
+	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
+	 * Retour : Retour la liste des statements créés
+	 * 
+	 */
+	public List<Statement>  creerStatementsRole(HashMap<String, String> roles, String nomReu, String acteur) throws URISyntaxException {
+		
+		List<Statement> listStatements = new LinkedList<Statement>();
+		
+		for(Map.Entry mapentry : roles.entrySet()){
+			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+				Agent agent = new Agent();
+				agent.setMbox("mailto:vincentglize@hotmail.fr");
+		      agent.setName(acteur);
+
+		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "role_"+nomReu);
+
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
+
+		      //ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
+		      //activity.setDefinition(ad);
+		      
+		      //activity.setId("test");
+		      
+		      Statement st = new Statement();
+		      st.setActor(agent);
+		      st.setVerb(verb);
+		      st.setObject(activity);
+		      
+		      listStatements.add(st);
+			
+		}
+		
+		return listStatements;
+	}
+	
+	
+	
+	/*
+	 * 
+	 * ENVOI STATEMENT SUR LE SERVEUR LRS
+	 * 
+	 */
+	public void envoieStatements(RemoteLRS lrs2, List<Statement> listStatements) {
+		StatementsResultLRSResponse lrsRes = lrs.saveStatements(listStatements);
+	    if (lrsRes.getSuccess()) {
+	        // success, use lrsRes.getContent() to get the statement back
+	    	//System.out.println("Mot bien enregistré");
+	    }
+	    else {
+	        // failure, error information is available in lrsRes.getErrMsg()
+	    	System.out.println("Problème lors de l'envoie du statement !: "+lrsRes.getErrMsg());
+	    	new Exception();
+	    }		
 	}
 
 }
