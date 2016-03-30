@@ -76,14 +76,13 @@ public class Xapi {
 
 	/*
 	 * Méthode pour créer les statements relatif aux infos de la réunion
-	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité
+	 * paramètre : les infos de la réunion en HASHMAP, le nom de la réunion traité
 	 * Retour : Retour la liste des statements créés
 	 * 
 	 */
-	public List<Statement> creationStatementInfoReu(RemoteLRS lrs2, HashMap<String, String> infoReu, String nomReu) throws URISyntaxException, IOException {
-		List listStatements = new LinkedList();
+	public List<Statement> creationStatementInfoReu(HashMap<String, String> infoReu, String nomReu) throws URISyntaxException, IOException {
+		List<Statement> listStatements = new LinkedList();
 		for(Map.Entry mapentry : infoReu.entrySet()){
-			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
 				Agent agent = new Agent();
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(nomReu);
@@ -91,12 +90,8 @@ public class Xapi {
 		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "information");
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
-		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
-
-		      ad.setExtensions(new Extensions(new StringOfJSON("{\"meetingID\":\"es2002\"}")));
-		      activity.setDefinition(ad);
 		      
-		      //activity.setId("test");
+		      System.out.println(mapentry.getKey().toString() + " " + mapentry.getValue().toString());
 		      
 		      Statement st = new Statement();
 		      st.setActor(agent);
@@ -104,14 +99,14 @@ public class Xapi {
 		      st.setObject(activity);
 		      
 		      listStatements.add(st);
-			
+		      System.out.println(st);
 		}
 		return listStatements;
 	}
 
 	/*
 	 * Méthode pour créer les statements relatif aux phrases dites d'un membre donné
-	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, acteur
+	 * paramètre : les infos de la réunion en HASHMAP, le nom de la réunion traité, acteur
 	 * Retour : Retour la liste des statements créés
 	 * 
 	 */
@@ -126,9 +121,6 @@ public class Xapi {
 			debut = value[0];
 			phrase = (String) value[1];
 			
-			System.out.println(phrase.toString());
-			
-			System.out.println(acteur + " clé " + mapentry.getKey() + " Valeur " + debut + " : " + phrase);
 				Agent agent = new Agent();
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
@@ -155,9 +147,6 @@ public class Xapi {
 		      st.setVerb(verb);
 		      st.setObject(activity);
 		      
-		      System.out.println("******************************************");
-		      System.out.println(st.toJSON());
-		      System.out.println("******************************************");
 
 		      listStatements.add(st);
 				
@@ -170,7 +159,7 @@ public class Xapi {
 	
 	/*
 	 * Méthode pour créer les statements relatif aux temps de chaque rôle d'un membre
-	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
+	 * paramètre : les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
 	 * Retour : Retour la liste des statements créés
 	 * 
 	 */
@@ -180,7 +169,7 @@ public class Xapi {
 		List<Statement> listStatements = new LinkedList();
 		
 		for(Map.Entry mapentry : object.entrySet()){
-			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
+			
 				Agent agent = new Agent();
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
@@ -210,7 +199,7 @@ public class Xapi {
 	
 	/*
 	 * Méthode pour créer les statements relatif aux role de chaque membre
-	 * paramètre : LRS, les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
+	 * paramètre : les infos de la réunion en HASHMAP, le nom de la réunion traité, le membre
 	 * Retour : Retour la liste des statements créés
 	 * 
 	 */
@@ -219,7 +208,6 @@ public class Xapi {
 		List<Statement> listStatements = new LinkedList<Statement>();
 		
 		for(Map.Entry mapentry : roles.entrySet()){
-			System.out.println("clé " + mapentry.getKey() + " Valeur " + mapentry.getValue());
 				Agent agent = new Agent();
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);

@@ -95,13 +95,14 @@ public class Main {
 	    	listStatements.addAll(xAPI.creerStatementsRole(fichierRoleC.creationRole(), nomReu, "C"));
 	    	listStatements.addAll(xAPI.creerStatementsRole(fichierRoleD.creationRole(), nomReu, "D"));
 	    	
+	    	listStatements.addAll(xAPI.creationStatementInfoReu(fichierInfoReu.infoReu(nomReu), nomReu));
 	    	
-	    	HashMap<String, String> test = fichierRoleA.creationRole();
+	    	
+	    	HashMap<String, String> test = fichierInfoReu.infoReu(nomReu);
 
 	    	for(Map.Entry mapentry : test.entrySet()){
 	    		System.out.println("Key " + mapentry.getKey() + " Value : " + mapentry.getValue());
 	    	}
-	    	
 	    	
 	    	//System.exit(1);
 	    	

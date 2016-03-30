@@ -95,9 +95,9 @@ public class FichierXML {
 			//On récupère les infos que pour note réunion
 			Element courant = (Element)i.next();
 			if(nomReu.equals(courant.getAttributeValue("observation"))) {
-				info.put("name", courant.getAttributeValue("name"));
+				info.put("titre", courant.getAttributeValue("name"));
 				info.put("date", courant.getAttributeValue("dateOnly"));
-				info.put("titre", courant.getAttributeValue("topic"));
+				info.put("description", courant.getAttributeValue("description"));
 				info.put("duree", courant.getAttributeValue("duration"));
 				/*
 				List<Element> listParticipant = courant.getChildren("speaker");
@@ -162,10 +162,7 @@ public class FichierXML {
 			if(".".equals(courant.getText()) || "!".equals(courant.getText()) || "?".equals(courant.getText())) {
 				//System.out.println("PONC : " + courant.getText());
 				numPhrase++;
-			}
-			else {
-				System.out.println(courant.getText() + " n " + numPhrase);
-			}			   
+			}		   
 		}
 		
 		return phrases;
