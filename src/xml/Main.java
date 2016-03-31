@@ -1,8 +1,10 @@
 package xml;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -11,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -25,6 +28,13 @@ import com.rusticisoftware.tincan.lrsresponses.StatementLRSResponse;
 import com.sun.corba.se.impl.oa.poa.ActiveObjectMap.Key;
 
 public class Main {
+	
+	static public Map<Float, String[]> TrieHashMap(HashMap<Float, String[]> listeNonTriee) {
+		Map<Float, String[]>listeTriee = new TreeMap<Float, String[]>(); 
+		listeTriee.putAll(listeNonTriee); 
+		return listeTriee; 
+	}
+	
 	//static String listDossier[] = {"words", "topic", "dossierTruc" , "DossierDia"}; //Stock la liste des dossier à traduire
 
 	
@@ -36,8 +46,8 @@ public class Main {
 		
 	//rojet10.jar ../tradXML/sourceXML/ ES2002d
 
-		String chemin = args[0];
-		String nomReu = args[1];
+		String chemin = args[0]; //"../tradXML/sourceXML/"; //args[0];
+		String nomReu = args[1]; //"ES2002d"; //args[1];
 		FichierXML fichierMot = null;
 		FichierXML fichierInfoReu = null;
 		
@@ -80,11 +90,12 @@ public class Main {
 	    List<Statement> listStatements = new LinkedList();
 	    try {
 	    	lrs = xAPI.initXapi();
+	    	HashMap<Float, String[]> phrases = fichierPhraseA.creationPhrase("A");
+	    	phrases.putAll(fichierPhraseB.creationPhrase("B"));
+	    	phrases.putAll(fichierPhraseC.creationPhrase("C"));
+	    	phrases.putAll(fichierPhraseD.creationPhrase("D"));
+	    	Map<Float, String[]> phraseTrie = TrieHashMap(phrases);
 	    	
-	    	listStatements.addAll(xAPI.creerStatementsPhrases(fichierPhraseA.creationPhrase(), nomReu, "A"));
-	    	listStatements.addAll(xAPI.creerStatementsPhrases(fichierPhraseB.creationPhrase(), nomReu, "B"));
-	    	listStatements.addAll(xAPI.creerStatementsPhrases(fichierPhraseC.creationPhrase(), nomReu, "C"));
-	    	listStatements.addAll(xAPI.creerStatementsPhrases(fichierPhraseD.creationPhrase(), nomReu, "D"));
 	    	listStatements.addAll(xAPI.creerStatementsRoleTemps(fichierRoleA.creationRoleTemps(), nomReu, "A"));
 	    	listStatements.addAll(xAPI.creerStatementsRoleTemps(fichierRoleB.creationRoleTemps(), nomReu, "B"));
 	    	listStatements.addAll(xAPI.creerStatementsRoleTemps(fichierRoleC.creationRoleTemps(), nomReu, "C"));
@@ -96,6 +107,11 @@ public class Main {
 	    	listStatements.addAll(xAPI.creerStatementsRole(fichierRoleD.creationRole(), nomReu, "D"));
 	    	
 	    	listStatements.addAll(xAPI.creationStatementInfoReu(fichierInfoReu.infoReu(nomReu), nomReu));
+	    	listStatements.addAll(xAPI.creerStatementsPhrases(phraseTrie, nomReu));
+	    	
+	    	String[] value;
+	    	String phrase;
+	    	String debut;
 	    	
 	    } catch(Exception e) {
 	    	System.out.println("Les données du corpus ne peuvent pas être traduites");

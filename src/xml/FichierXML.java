@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.jdom2.Element;
 import org.jdom2.input.SAXBuilder;
@@ -135,13 +137,13 @@ public class FichierXML {
 	 * Retour : tableau avec les phrases
 	 * 
 	 */
-	public HashMap<Integer, String[]> creationPhrase() {
+	public HashMap<Float, String[]> creationPhrase(String acteur) {
 		List<Element> listNite = racine.getChildren("w");
 		int numPhrase = 0;
+		float debutPhrase = 0;
 		//String phrase;
 		String[] phrase;
-		phrase = new String[2];
-		 HashMap<Integer, String[]> phrases = new HashMap<Integer, String[]>(); 
+		 HashMap<Float, String[]> phrases = new HashMap<Float, String[]>(); 
 
 		   //On crée un Iterator sur notre liste
 		Iterator i = listNite.iterator();
@@ -150,19 +152,21 @@ public class FichierXML {
 			//On recrée l'Element courant à chaque tour de boucle
 			Element courant = (Element)i.next();
 			
-			phrase = phrases.get(numPhrase);
+			phrase = phrases.get(debutPhrase);
 			
-			if(phrases.get(numPhrase) == null)
-				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), courant.getText() });
+			//phrases.put(debutPhrase, new String[]{ courant.getAttributeValue("starttime"), courant.getText() });
+			
+			if(phrases.get(debutPhrase) == null)
+				phrases.put(debutPhrase, new String[]{ acteur, courant.getText() });
 			else if(",".equals(courant.getText()) || ".".equals(courant.getText()))
-				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), phrase[1] + courant.getText() });
+				phrases.put(debutPhrase, new String[]{ acteur, phrase[1] + courant.getText() });
 			else
-				phrases.put(numPhrase, new String[]{ courant.getAttributeValue("starttime"), phrase[1] + " " + courant.getText() });
+				phrases.put(debutPhrase, new String[]{ acteur, phrase[1] + " " + courant.getText() });
 			
 			//Si fin de phrase
 			if(".".equals(courant.getText()) || "!".equals(courant.getText()) || "?".equals(courant.getText())) {
 				//System.out.println("PONC : " + courant.getText());
-				numPhrase++;
+				debutPhrase = Float.parseFloat(courant.getAttributeValue("starttime"));
 			}		   
 		}
 		

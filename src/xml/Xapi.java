@@ -108,7 +108,8 @@ public class Xapi {
 	 * Retour : Retour la liste des statements créés
 	 * 
 	 */
-	public List<Statement> creerStatementsPhrases(HashMap<Integer, String[]> phrases, String nomReu, String acteur) throws URISyntaxException, IOException {
+	/*
+	public List<Statement> creerStatementsPhrasesAncien(HashMap<Integer, String[]> phrases, String nomReu, String acteur) throws URISyntaxException, IOException {
 		String debut;
 		String phrase;
 		String test;
@@ -152,6 +153,60 @@ public class Xapi {
 		
 		return listStatements;
 		
+	}
+	*/
+	
+	/*
+	 * Méthode pour créer les statements relatif aux phrases dites d'un membre donné
+	 * paramètre : les infos de la réunion en HASHMAP, le nom de la réunion traité, acteur
+	 * Retour : Retour la liste des statements créés
+	 * 
+	 */	
+	public List<Statement> creerStatementsPhrases(Map<Float, String[]> phrases, String nomReu) throws URISyntaxException {
+		List<Statement> listStatements = new LinkedList();
+		String debut;
+		String phrase;
+		String acteur;
+		String[] value;
+		for(Map.Entry mapentry : phrases.entrySet()){
+			value = (String[]) mapentry.getValue();
+			acteur = value[0];
+			phrase = (String) value[1];
+			
+			debut = mapentry.getKey().toString();
+			
+				Agent agent = new Agent();
+				agent.setMbox("mailto:vincentglize@hotmail.fr");
+		      agent.setName(acteur);
+
+		      Verb verb = new Verb("http://projet10.fr/verbs/phrase/"+nomReu, "phrase");
+		      
+
+		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", phrase, debut);
+		      ActivityDefinition ad = new ActivityDefinition(phrase, debut);
+
+		      //ad.setExtensions(new Extensions(new StringOfJSON("meetingID:es2002")));
+		      //ad.setMoreInfo("es2002");
+		      
+		      
+		      //activity.setDefinition(ad);
+		      
+		      
+		      
+		      
+		      //activity.setId("test");
+		      
+		      Statement st = new Statement();
+		      st.setActor(agent);
+		      st.setVerb(verb);
+		      st.setObject(activity);
+		      
+
+		      listStatements.add(st);
+				
+		}
+		
+		return listStatements;
 	}
 
 	
