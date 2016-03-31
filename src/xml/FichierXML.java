@@ -99,6 +99,7 @@ public class FichierXML {
 				info.put("date", courant.getAttributeValue("dateOnly"));
 				info.put("description", courant.getAttributeValue("description"));
 				info.put("duree", courant.getAttributeValue("duration"));
+				info.put("nom", nomReu);
 				/*
 				List<Element> listParticipant = courant.getChildren("speaker");
 				Iterator i2 = listParticipant.iterator();

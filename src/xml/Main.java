@@ -29,15 +29,15 @@ public class Main {
 
 	
 	public static void main(String[] args) throws MalformedURLException, URISyntaxException {
-		/*if(args[0] == null || args[1] == null){
+		if(args[0] == null || args[1] == null){
 			System.out.println("Il faut passer des arguments à la commande : leCheminVersLeCorpus leNomDeLaReu");
 			System.exit(1);
-		}*/
+		}
 		
 	//rojet10.jar ../tradXML/sourceXML/ ES2002d
 
-		String chemin = "../tradXML/sourceXML/";  //args[0];
-		String nomReu = "ES2002d"; //args[1];
+		String chemin = args[0];
+		String nomReu = args[1];
 		FichierXML fichierMot = null;
 		FichierXML fichierInfoReu = null;
 		
@@ -96,15 +96,6 @@ public class Main {
 	    	listStatements.addAll(xAPI.creerStatementsRole(fichierRoleD.creationRole(), nomReu, "D"));
 	    	
 	    	listStatements.addAll(xAPI.creationStatementInfoReu(fichierInfoReu.infoReu(nomReu), nomReu));
-	    	
-	    	
-	    	HashMap<String, String> test = fichierInfoReu.infoReu(nomReu);
-
-	    	for(Map.Entry mapentry : test.entrySet()){
-	    		System.out.println("Key " + mapentry.getKey() + " Value : " + mapentry.getValue());
-	    	}
-	    	
-	    	//System.exit(1);
 	    	
 	    } catch(Exception e) {
 	    	System.out.println("Les données du corpus ne peuvent pas être traduites");

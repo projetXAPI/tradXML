@@ -87,19 +87,17 @@ public class Xapi {
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(nomReu);
 
-		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "information");
+		      Verb verb = new Verb("http://projet10.fr/verbs/information/"+nomReu, "information");
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
 		      
-		      System.out.println(mapentry.getKey().toString() + " " + mapentry.getValue().toString());
-		      
+		     	      
 		      Statement st = new Statement();
 		      st.setActor(agent);
 		      st.setVerb(verb);
 		      st.setObject(activity);
 		      
 		      listStatements.add(st);
-		      System.out.println(st);
 		}
 		return listStatements;
 	}
@@ -125,7 +123,7 @@ public class Xapi {
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
 
-		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "phrase_"+nomReu);
+		      Verb verb = new Verb("http://projet10.fr/verbs/phrase/"+nomReu, "phrase");
 		      
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", phrase, debut);
@@ -174,7 +172,7 @@ public class Xapi {
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
 
-		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "temps_role_"+nomReu);
+		      Verb verb = new Verb("http://projet10.fr/verbs/temps_role/"+nomReu, "temps_role");
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
 		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
@@ -212,7 +210,7 @@ public class Xapi {
 				agent.setMbox("mailto:vincentglize@hotmail.fr");
 		      agent.setName(acteur);
 
-		      Verb verb = new Verb("http://adlnet.gov/expapi/verbs/attempted", "role_"+nomReu);
+		      Verb verb = new Verb("http://projet10.fr/verbs/role/"+nomReu, "role");
 
 		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
 		      ActivityDefinition ad = new ActivityDefinition(mapentry.getKey().toString(), mapentry.getValue().toString());
