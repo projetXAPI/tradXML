@@ -89,8 +89,8 @@ public class Xapi {
 
 		      Verb verb = new Verb("http://projet10.fr/verbs/information/"+nomReu, "information");
 
-		      Activity activity = new Activity("http://rusticisoftware.github.com/TinCanJava", mapentry.getKey().toString(), mapentry.getValue().toString());
-		      
+		      Activity activity = new Activity("http://projet10.fr/activity/information/", mapentry.getKey().toString(), mapentry.getValue().toString());
+		      activity.setId("http://projet10.fr/activity/information/");
 		     	      
 		      Statement st = new Statement();
 		      st.setActor(agent);
